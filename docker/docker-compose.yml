@@ -1,0 +1,11 @@
+services:
+  backend:
+    build:
+      context: ../src/backend
+      dockerfile: Dockerfile
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    driver: bridge

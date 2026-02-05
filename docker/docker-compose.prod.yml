@@ -15,9 +15,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER_PROD:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PROD:-password}
       POSTGRES_DB: ${POSTGRES_DB_PROD:-cloudnative}
-
+    ports:
+      - "${POSTGRES_PORT_PROD:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../database/:/docker-entrypoint-initdb.d/
 
 volumes:
   postgres_data:

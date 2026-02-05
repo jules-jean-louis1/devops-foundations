@@ -16,12 +16,15 @@ services:
       - "${DEV_BACKEND_PORT:-3000}:3000"
     volumes:
       - ../src/backend:/usr/src/app
+      - ../database/:/docker-entrypoint-initdb.d/
 
   postgres:
     environment:
       POSTGRES_USER: ${POSTGRES_USER_DEV:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_DEV:-password}
       POSTGRES_DB: ${POSTGRES_DB_DEV:-cloudnative}
+    ports:
+      - "${POSTGRES_PORT_DEV:-5433}:5432"
 
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data

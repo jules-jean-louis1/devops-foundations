@@ -13,10 +13,19 @@ services:
       - MAIL_FROM=${MAIL_FROM}
       - MAIL_TO=${MAIL_TO}
     ports:
-      - "${DEV_BACKEND_PORT:-3000}:3000"
+      - "${BACKEND_PORT:-3000}:3000"
     volumes:
       - ../src/backend:/usr/src/app
-      - ../database/:/docker-entrypoint-initdb.d/
+
+  frontend:
+    build:
+      target: development
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001"
+    volumes:
+      - ../src/frontend:/usr/src/app
 
   postgres:
     environment:
@@ -28,6 +37,7 @@ services:
 
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
+      - ../database/:/docker-entrypoint-initdb.d/
 
 volumes:
   postgres_data_dev:

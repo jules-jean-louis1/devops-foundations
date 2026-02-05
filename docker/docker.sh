@@ -25,6 +25,11 @@ if ! test -f "$env_file"; then
     exit 1
 fi
 
+# Load environment variables from .env
+set -a
+source docker/.env
+set +a
+
 launch_compose="docker-compose"
 if ! command -v ${launch_compose} &> /dev/null; then
     launch_compose="docker compose"

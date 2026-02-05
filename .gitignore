@@ -1,0 +1,5 @@
+/docker/.env
+/src/backend/node_modules
+/src/backend/dist
+/src/backend/.env
+.DS_Store

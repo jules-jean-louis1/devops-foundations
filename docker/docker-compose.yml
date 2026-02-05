@@ -1,0 +1,48 @@
+services:
+  backend:
+    build:
+      context: ../src/backend
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - backend_net
+
+  postgres:
+    image: postgres:17.2-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - backend_net
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - backend_net
+
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: "none"
+    ports:
+      - "${PORT_SMTP:-1025}:1025"
+      - "${MAIL_WEB_PORT:-8025}:8025"
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    driver: bridge

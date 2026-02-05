@@ -16,6 +16,18 @@ services:
       start_period: 40s
     networks:
       - backend_net
+      - traefik_net
+
+  frontend:
+    build:
+      context: ../src/frontend
+      dockerfile: Dockerfile
+    environment:
+      - PUBLIC_BACKEND_URL=${BACKEND_URL}
+    depends_on:
+      - backend
+    networks:
+      - traefik_net
 
   postgres:
     image: postgres:17.2-alpine
@@ -45,4 +57,6 @@ services:
 
 networks:
   backend_net:
+    driver: bridge
+  traefik_net:
     driver: bridge

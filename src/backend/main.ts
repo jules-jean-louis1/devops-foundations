@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import postgres from "@fastify/postgres";
 import redis from "@fastify/redis";
 import nodemailer from "nodemailer";
+import cors from "@fastify/cors";
 
 const fastify = Fastify({
   logger: true,
@@ -14,6 +15,12 @@ fastify.register(postgres, {
 
 fastify.register(redis, {
   url: process.env.REDIS_URL || "redis://redis:6379",
+});
+
+fastify.register(cors, {
+  origin: "http://localhost:3001",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
 });
 
 const transporter = nodemailer.createTransport({

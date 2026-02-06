@@ -1,4 +1,3 @@
-// ESM
 import Fastify from "fastify";
 import postgres from "@fastify/postgres";
 import redis from "@fastify/redis";
@@ -21,6 +20,14 @@ fastify.register(cors, {
   origin: "http://localhost:3001",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
+});
+
+fastify.addHook("onReady", async () => {
+  const init = await fastify.redis.get("visits");
+
+  if (init === null) {
+    await fastify.redis.set("visits", 0);
+  }
 });
 
 const transporter = nodemailer.createTransport({
@@ -91,6 +98,21 @@ fastify.get("/cache", async function (request: any, reply: any) {
       status: "disconnected",
       error: err.message,
       timestamp: new Date(),
+    });
+  }
+});
+
+fastify.get("/cache/visits", async function (request: any, reply: any) {
+  try {
+    const visits = await fastify.redis.get("visits");
+    const updateVistis = parseInt(visits!) + 1;
+    await fastify.redis.set("visits", updateVistis);
+    reply.status(200).send({
+      visits: updateVistis,
+    });
+  } catch (e) {
+    reply.status(500).send({
+      error: e,
     });
   }
 });

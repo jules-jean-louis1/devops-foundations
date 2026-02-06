@@ -1,6 +1,8 @@
+import { PUBLIC_BACKEND_URL } from "$env/static/public";
+
 interface ContactFormData {
-  sender: string;
-  subject: string;
+  email: string;
+  name: string;
   content: string;
 }
 
@@ -12,17 +14,17 @@ interface ApiResponse<T = unknown> {
 
 export const contactService = {
   async sendMessage(formData: ContactFormData): Promise<ApiResponse> {
-    const response = await fetch('/api/contact', {
-      method: 'POST',
+    const response = await fetch(PUBLIC_BACKEND_URL + "/contact", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Erreur lors de l\'envoi');
+      throw new Error(error.message || "Erreur lors de l'envoi");
     }
 
     return response.json();

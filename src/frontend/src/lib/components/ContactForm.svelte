@@ -19,8 +19,8 @@
 
         try {
             const response = await contactService.sendMessage({
-                sender: formData.get("sender") as string,
-                subject: formData.get("subject") as string,
+                email: formData.get("email") as string,
+                name: formData.get("name") as string,
                 content: formData.get("content") as string,
             });
 
@@ -55,10 +55,10 @@
     <h2>Contactez-nous</h2>
     <form on:submit={handleSubmit}>
         <div class="form-group">
-            <label for="sender">Email</label>
+            <label for="email">Email</label>
             <input
-                id="sender"
-                name="sender"
+                id="email"
+                name="email"
                 type="email"
                 placeholder="votre.email@exemple.com"
                 required
@@ -67,12 +67,12 @@
         </div>
 
         <div class="form-group">
-            <label for="subject">Objet</label>
+            <label for="name">Nom</label>
             <input
-                id="subject"
-                name="subject"
+                id="name"
+                name="name"
                 type="text"
-                placeholder="Sujet de votre message"
+                placeholder="Votre nom"
                 required
                 disabled={isLoading}
             />

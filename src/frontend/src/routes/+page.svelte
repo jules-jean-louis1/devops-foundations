@@ -59,7 +59,7 @@
 </script>
 
 <main>
-    <h1>Welcome to SvelteKit</h1>
+    <h1>CloudNative Labs - Dashboard</h1>
 
     <section class="status-section">
         <h2>Service Status</h2>

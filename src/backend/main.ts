@@ -100,9 +100,9 @@ fastify.post<{ Body: any }>(
   "/contact",
   async function (request: any, reply: any) {
     try {
-      const { name, email, message, recipient_email } = request.body;
+      const { email, name, content } = request.body;
 
-      if (!name || !email || !message) {
+      if (!email || !name || !content) {
         return reply.status(400).send({
           status: "error",
           message: "Missing required fields: name, email, message",
@@ -110,41 +110,44 @@ fastify.post<{ Body: any }>(
       }
 
       const mailOptions = {
-        from: process.env.MAIL_FROM || "noreply@cloudnative.dev",
-        to: recipient_email || process.env.MAIL_TO || "contact@cloudnative.dev",
-        replyTo: email,
+        from: email || process.env.MAIL_FROM || "noreply@cloudnative.dev",
+        to: process.env.MAIL_TO || "contact@cloudnative.dev",
         subject: `Nouveau message de contact de ${name}`,
-        text: message,
+        text: content,
         html: `
         <h2>Nouveau message de contact</h2>
         <p><strong>Nom:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, "<br>")}</p>
+        <p>${content.replace(/\n/g, "<br>")}</p>
       `,
       };
 
-      try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent:", info.response);
-        reply.status(200).send({
-          status: "success",
-          message: "Email sent successfully",
-          messageId: info.messageId,
-        });
-      } catch (error: any) {
-        console.error("Email error:", error);
-        reply.status(500).send({
-          status: "error",
-          message: "Failed to send email",
-          error: error.message,
-        });
-      }
-    } catch (err: any) {
-      reply.status(500).send({
+      // Email send
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Email sent:", info.response);
+
+      await fastify.pg.query(
+        `INSERT INTO contact (sender, recipient, subject, content, created_at) VALUES ($1, $2, $3, $4, NOW())`,
+        [
+          email,
+          "contact@cloudnative.dev",
+          `Nouveau message de contact de ${name}`,
+          content,
+        ],
+      );
+
+      return reply.status(200).send({
+        status: "success",
+        message: "Message sent and saved successfully",
+        messageId: info.messageId,
+      });
+    } catch (error: any) {
+      console.error("Error:", error);
+      return reply.status(500).send({
         status: "error",
-        message: "Server error",
-        error: err.message,
+        message: "An error occurred",
+        error: error.message,
       });
     }
   },

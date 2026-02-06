@@ -18,6 +18,13 @@ services:
     ports:
       - "${FRONTEND_PORT:-3001}:3001"
 
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis_volume:/data
+
   postgres:
     environment:
       POSTGRES_USER: ${POSTGRES_USER_PROD:-postgres}

@@ -27,6 +27,12 @@ services:
     volumes:
       - ../src/frontend:/usr/src/app
 
+  redis:
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis_volume_dev:/data
+
   postgres:
     environment:
       POSTGRES_USER: ${POSTGRES_USER_DEV:-postgres}
@@ -42,3 +48,4 @@ services:
 volumes:
   postgres_data_dev:
   backend:
+  redis_volume_dev:

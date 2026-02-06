@@ -15,10 +15,13 @@
         redis: false,
     };
 
+    let visitorCount = 0;
+
     onMount(async () => {
         await getDbStatus();
         await getBackendStatus();
         await getCacheStatus();
+        await getVisitor();
     });
 
     async function getDbStatus(): Promise<void> {
@@ -56,6 +59,18 @@
             console.error("Cache status check failed:", error);
         }
     }
+
+    async function getVisitor(): Promise<void> {
+        try {
+            const res = await fetch(PUBLIC_BACKEND_URL + "/cache/visits");
+            const visits = await res.json();
+            if (res.ok) {
+                visitorCount = visits.visits;
+            }
+        } catch (error) {
+            throw new Error("Cache failed:");
+        }
+    }
 </script>
 
 <main>
@@ -83,6 +98,11 @@
                     Redis: <span class={status.redis ? "ok" : "down"}>
                         {status.redis ? "✓ OK" : "✗ Down"}
                     </span>
+                </p>
+            </div>
+            <div class="status-item">
+                <p>
+                    Visitors: <span> {visitorCount} </span>
                 </p>
             </div>
         </div>

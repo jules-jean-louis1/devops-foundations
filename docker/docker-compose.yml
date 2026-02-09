@@ -72,6 +72,15 @@ services:
     networks:
       - backend_net
 
+  adminer:
+    image: adminer:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend_net
+      - traefik_net
+
 networks:
   backend_net:
     driver: bridge

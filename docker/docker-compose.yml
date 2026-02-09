@@ -1,4 +1,15 @@
 services:
+  traefik:
+    image: traefik:v3.6
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+    networks:
+      - traefik_net
+
   backend:
     build:
       context: ../src/backend
@@ -17,6 +28,9 @@ services:
     networks:
       - backend_net
       - traefik_net
+    labels:
+      - traefik.enable=true
+      - traefix.http.backend.rule=Host(`api.localhost`)
 
   frontend:
     build:
@@ -28,6 +42,9 @@ services:
       - backend
     networks:
       - traefik_net
+    labels:
+      - traefik.enable=true
+      - traefix.http.backend.rule=Host(`app.localhost`)
 
   postgres:
     image: postgres:17.2-alpine

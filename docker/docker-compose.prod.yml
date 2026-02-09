@@ -4,7 +4,7 @@ services:
       target: production
     ports:
       - "${BACKEND_PORT:-8080}:3000"
-    restart: always
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER_PROD}:${POSTGRES_PASSWORD_PROD}@postgres:5432/${POSTGRES_DB_PROD}
@@ -13,6 +13,7 @@ services:
   frontend:
     build:
       target: production
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
     ports:
@@ -23,6 +24,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER_PROD:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PROD:-password}
       POSTGRES_DB: ${POSTGRES_DB_PROD:-cloudnative}
+    restart: always
     ports:
       - "${POSTGRES_PORT_PROD:-5433}:5432"
     volumes:

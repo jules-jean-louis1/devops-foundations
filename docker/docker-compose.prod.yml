@@ -1,4 +1,9 @@
 services:
+  traefik:
+    command:
+      - "--providers.docker=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+
   backend:
     build:
       target: production

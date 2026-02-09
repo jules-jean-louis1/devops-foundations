@@ -25,6 +25,20 @@ if ! test -f "$env_file"; then
     exit 1
 fi
 
+# Certs
+crt="../traefik/certs/local.crt"
+key="../traefik/certs/local.key"
+if ! test -f "$crt" || ! test -f "$key"; then
+    echo "Certs not find, run chmod +x ./traefik/generate-certs.sh and ./traefik/generate-certs.sh"
+    exit 1
+fi
+
+#Generate password for traefik
+if ! test -f "traefik/.htpasswd"; then
+    echo "Use docker run --rm httpd:alpine htpasswd -nbB test1 password"
+    exit 1
+fi
+
 # Load environment variables from .env
 set -a
 source docker/.env

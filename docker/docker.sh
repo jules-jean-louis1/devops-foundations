@@ -26,9 +26,9 @@ if ! test -f "$env_file"; then
 fi
 
 # Certs
-crt="../traefik/certs/local.crt"
-key="../traefik/certs/local.key"
-if ! test -f "$crt" || ! test -f "$key"; then
+crt="traefik/certs/local.crt"
+key="traefik/certs/local.key"
+if [ ! -f "$crt" ] || [ ! -f "$key" ]; then
     echo "Certs not find, run chmod +x ./traefik/generate-certs.sh and ./traefik/generate-certs.sh"
     exit 1
 fi

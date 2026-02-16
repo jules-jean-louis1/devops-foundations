@@ -18,7 +18,7 @@ services:
       - MAIL_FROM=${MAIL_FROM}
       - MAIL_TO=${MAIL_TO}
     ports:
-      - "${BACKEND_PORT:-3000}:3000"
+      - "${BACKEND_PORT:-3002}:3002"
     volumes:
       - ../src/backend:/usr/src/app
 

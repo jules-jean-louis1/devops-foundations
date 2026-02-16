@@ -17,7 +17,7 @@ fastify.register(redis, {
 });
 
 fastify.register(cors, {
-  origin: "http://localhost:3001",
+  origin: "https://app.localhost",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 });

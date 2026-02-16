@@ -1,4 +1,9 @@
 services:
+  traefik:
+    command:
+      - "--providers.docker=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+
   backend:
     build:
       target: development
@@ -40,7 +45,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB_DEV:-cloudnative}
     ports:
       - "${POSTGRES_PORT_DEV:-5433}:5432"
-
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
       - ../database/:/docker-entrypoint-initdb.d/

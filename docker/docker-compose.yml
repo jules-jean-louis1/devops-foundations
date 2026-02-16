@@ -1,4 +1,18 @@
 services:
+  traefik:
+    image: traefik:v3.6
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ../traefik/dynamic/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ../traefik/certs:/etc/traefik/certs:ro
+      - ../traefik/.htpasswd:/etc/traefik/.htpasswd:ro
+    networks:
+      - traefik_net
+
   backend:
     build:
       context: ../src/backend
@@ -9,7 +23,7 @@ services:
       redis:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://backend:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -23,7 +37,7 @@ services:
       context: ../src/frontend
       dockerfile: Dockerfile
     environment:
-      - PUBLIC_BACKEND_URL=${BACKEND_URL}
+      - PUBLIC_BACKEND_URL=https://api.localhost
     depends_on:
       - backend
     networks:
@@ -59,6 +73,15 @@ services:
       - "${MAIL_WEB_PORT:-8025}:8025"
     networks:
       - backend_net
+
+  adminer:
+    image: adminer:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend_net
+      - traefik_net
 
 networks:
   backend_net:

@@ -14,6 +14,9 @@ entryPoints:
   websecure:
     address: :443
 
+  metrics:
+    address: :8082
+
 api:
   dashboard: true
   insecure: false
@@ -30,3 +33,15 @@ providers:
 
 log:
   level: INFO
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    entryPoint: metrics
+
+accessLog:
+  bufferingSize: 100
+  filters:
+    statusCodes: []

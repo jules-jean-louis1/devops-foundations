@@ -5,11 +5,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CERTS_DIR="$SCRIPT_DIR/certs"
 
-echo "🔐 Génération des certificats avec mkcert..."
-
 # Vérifier si mkcert est installé
 if ! command -v mkcert &> /dev/null; then
-    echo "❌ mkcert n'est pas installé"
+    echo "mkcert n'est pas installé"
     echo "Installation:"
     echo "  macOS: brew install mkcert"
     echo "  Linux: sudo apt-get install mkcert"
@@ -21,11 +19,9 @@ fi
 mkdir -p "$CERTS_DIR"
 
 # Installer l'autorité de certification locale
-echo "📦 Installation du CA local..."
 mkcert -install
 
 # Générer les certificats
-echo "🎯 Génération des certificats..."
 mkcert \
     -cert-file "$CERTS_DIR/local.crt" \
     -key-file "$CERTS_DIR/local.key" \
@@ -36,9 +32,9 @@ mkcert \
     db.localhost \
     mail.localhost \
     traefik.localhost \
+    monitor.localhost \
+    prometheus.localhost \
     127.0.0.1 \
     ::1
 
-echo "✅ Certificats générés:"
-echo "   Certificat: $CERTS_DIR/local.crt"
-echo "   Clé privée: $CERTS_DIR/local.key"
+echo "Certificats générés."

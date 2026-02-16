@@ -23,7 +23,8 @@ http:
 
     dashboard-auth:
       basicAuth:
-        userFile: /etc/traefik/.htpasswd
+        users:
+          - "test1:$2y$05$doLFFnMY/Vb/0Wwvo/Bquewj6.tbOc/g0F91OOE3UCe1u4k8BQ81."
 
   routers:
     traefik:
@@ -77,11 +78,21 @@ http:
         - dashboard-auth
         - security-headers
 
+    grafana:
+      rule: "Host(`monitor.localhost`)"
+      entryPoints:
+        - websecure
+      service: grafana
+      tls: {}
+      middlewares:
+        - dashboard-auth
+        - security-headers
+
   services:
     backend:
       loadBalancer:
         servers:
-          - url: "http://backend:3000"
+          - url: "http://backend:3002"
 
     frontend:
       loadBalancer:
@@ -97,3 +108,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://adminer:8080"
+
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://grafana:3000"

@@ -40,3 +40,8 @@ metrics:
     addRoutersLabels: true
     addServicesLabels: true
     entryPoint: metrics
+
+accessLog:
+  bufferingSize: 100
+  filters:
+    statusCodes: []

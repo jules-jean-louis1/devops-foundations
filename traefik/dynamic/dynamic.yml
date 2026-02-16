@@ -23,8 +23,7 @@ http:
 
     dashboard-auth:
       basicAuth:
-        users:
-          - "test1:$2y$05$doLFFnMY/Vb/0Wwvo/Bquewj6.tbOc/g0F91OOE3UCe1u4k8BQ81."
+        usersFile: /etc/traefik/.htpasswd
 
   routers:
     traefik:
@@ -73,6 +72,16 @@ http:
       entryPoints:
         - websecure
       service: adminer
+      tls: {}
+      middlewares:
+        - dashboard-auth
+        - security-headers
+    
+    prometheus:
+      rule: "Host(`prometheus.localhost`)"
+      entryPoints:
+        - websecure
+      service: prometheus
       tls: {}
       middlewares:
         - dashboard-auth

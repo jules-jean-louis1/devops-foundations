@@ -1,7 +1,7 @@
 import { json, error } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 
-const BACKEND_URL = process.env.PUBLIC_BACKEND_URL || "http://localhost:3001";
+const BACKEND_URL = process.env.PUBLIC_BACKEND_URL || "http://localhost:3002";
 
 export const POST: RequestHandler = async ({ request }) => {
   try {

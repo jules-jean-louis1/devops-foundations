@@ -22,7 +22,7 @@ USER node
 COPY --chown=node:node package*.json ./
 RUN npm install
 COPY --chown=node:node . .
-EXPOSE 3000
+EXPOSE 3002
 CMD ["dumb-init", "npm", "run", "dev"]
 
 # ----------------------------
@@ -49,5 +49,5 @@ COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 COPY --chown=node:node --from=build /usr/src/app/package.json ./
 
-EXPOSE 3000
+EXPOSE 3002
 CMD ["dumb-init", "node", "dist/main.js"]

@@ -4,6 +4,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8082:8082"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -83,8 +84,24 @@ services:
       - backend_net
       - traefik_net
 
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    volumes:
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    depends_on:
+      - cadvisor
+    networks:
+      - backend_net
+      - traefik_net
+    restart: unless-stopped
 networks:
   backend_net:
     driver: bridge
   traefik_net:
     driver: bridge
+
+volumes:
+  prometheus-data:

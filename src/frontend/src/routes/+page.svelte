@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { PUBLIC_BACKEND_URL } from "$env/static/public";
+    import { env } from '$env/dynamic/public';
     import ContactForm from "$lib/components/ContactForm.svelte";
 
     interface StatusType {
@@ -23,11 +23,11 @@
         await getCacheStatus();
         await getVisitor();
     });
-
+    
     async function getDbStatus(): Promise<void> {
         status.database = false;
         try {
-            const res = await fetch(PUBLIC_BACKEND_URL + "/db");
+            const res = await fetch(env.PUBLIC_BACKEND_URL + "/db");
             if (res.ok) {
                 status.database = true;
             }
@@ -39,7 +39,7 @@
     async function getBackendStatus(): Promise<void> {
         status.backend = false;
         try {
-            const res = await fetch(PUBLIC_BACKEND_URL + "/health");
+            const res = await fetch(env.PUBLIC_BACKEND_URL + "/health");
             if (res.ok) {
                 status.backend = true;
             }
@@ -51,7 +51,7 @@
     async function getCacheStatus(): Promise<void> {
         status.redis = false;
         try {
-            const res = await fetch(PUBLIC_BACKEND_URL + "/cache");
+            const res = await fetch(env.PUBLIC_BACKEND_URL + "/cache");
             if (res.ok) {
                 status.redis = true;
             }
@@ -62,7 +62,7 @@
 
     async function getVisitor(): Promise<void> {
         try {
-            const res = await fetch(PUBLIC_BACKEND_URL + "/cache/visits");
+            const res = await fetch(env.PUBLIC_BACKEND_URL + "/cache/visits");
             const visits = await res.json();
             if (res.ok) {
                 visitorCount = visits.visits;

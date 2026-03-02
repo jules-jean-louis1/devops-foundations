@@ -3,13 +3,30 @@ services:
     command:
       - "--providers.docker=true"
       - "--providers.file.filename=/etc/traefik/dynamic.yml"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
 
   backend:
     build:
       target: production
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     ports:
       - "${BACKEND_PORT:-8080}:3002"
-    restart: unless-stopped
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER_PROD}:${POSTGRES_PASSWORD_PROD}@postgres:5432/${POSTGRES_DB_PROD}
@@ -20,6 +37,15 @@ services:
     build:
       target: production
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
     environment:
       - NODE_ENV=production
       - PUBLIC_BACKEND_URL=https://api.example.com
@@ -29,6 +55,7 @@ services:
   redis:
     image: redis:7-alpine
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    restart: always
     volumes:
       - ../redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis_volume:/data

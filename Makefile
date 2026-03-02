@@ -28,5 +28,16 @@ start:
 stop:
 	./docker/docker.sh stop
 
+restart:
+    $(eval ARGS := $(filter-out $@,$(MAKECMDGOALS)))
+	./docker/docker.sh restart $(ARGS)
+
 remove:
 	./docker/docker.sh down -v
+
+logs:
+    $(eval ARGS := $(filter-out $@,$(MAKECMDGOALS)))
+	./docker/docker.sh logs -f $(ARGS)
+
+ps:
+	./docker/docker.sh ps

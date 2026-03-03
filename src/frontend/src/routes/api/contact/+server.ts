@@ -2,7 +2,7 @@ import { json, error } from "@sveltejs/kit";
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from "@sveltejs/kit";
 
-const BACKEND_URL = env.PUBLIC_BACKEND_URL  || "http://localhost:3002";
+const BACKEND_URL = "https://api.localhost";
 
 export const POST: RequestHandler = async ({ request }) => {
   try {

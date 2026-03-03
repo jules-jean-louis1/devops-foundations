@@ -122,11 +122,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://grafana:3000"
-<<<<<<< HEAD
 
     prometheus:
       loadBalancer:
         servers:
           - url: "http://prometheus:9090"
-=======
->>>>>>> 573a8c7aaa81228da190e0348cf114956ffb732a

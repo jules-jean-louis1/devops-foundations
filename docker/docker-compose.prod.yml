@@ -18,6 +18,8 @@ services:
       target: production
     restart: unless-stopped
     deploy:
+      mode: replicated
+      replicas: 2
       resources:
         limits:
           cpus: "1"
@@ -31,7 +33,6 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER_PROD}:${POSTGRES_PASSWORD_PROD}@postgres:5432/${POSTGRES_DB_PROD}
       - REDIS_URL=${REDIS_URL}
-      - CORS_ORIGIN=https://app.example.com
 
   frontend:
     build:
@@ -45,7 +46,6 @@ services:
         reservations:
           cpus: "0.5"
           memory: 256M
-
     environment:
       - NODE_ENV=production
       - PUBLIC_BACKEND_URL=https://api.example.com

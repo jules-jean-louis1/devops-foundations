@@ -5,3 +5,4 @@
 .DS_Store
 /traefik/certs/*
 /traefik/.htpasswd
+./traefik/.htpasswd

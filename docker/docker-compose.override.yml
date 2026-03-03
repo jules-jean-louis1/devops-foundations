@@ -3,10 +3,12 @@ services:
     command:
       - "--providers.docker=true"
       - "--providers.file.filename=/etc/traefik/dynamic.yml"
+    restart: "no"
 
   backend:
     build:
       target: development
+    restart: "no"
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://${POSTGRES_USER_DEV}:${POSTGRES_PASSWORD_DEV}@postgres:5432/${POSTGRES_DB_DEV}
@@ -25,6 +27,7 @@ services:
   frontend:
     build:
       target: development
+    restart: "no"
     environment:
       - NODE_ENV=development
     ports:

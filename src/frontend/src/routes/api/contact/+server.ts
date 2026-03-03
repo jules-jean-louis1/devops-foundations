@@ -1,4 +1,5 @@
 import { json, error } from "@sveltejs/kit";
+import { env } from '$env/dynamic/private';
 import type { RequestHandler } from "@sveltejs/kit";
 
 const BACKEND_URL = "https://api.localhost";

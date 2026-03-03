@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import ContactForm from "$lib/components/ContactForm.svelte";
-    import { contactService } from "$lib/services/contactService";
     import { apiService } from "$lib/services/apiService";
 
     interface StatusType {

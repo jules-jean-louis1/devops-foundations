@@ -21,8 +21,6 @@ EXPOSE 3001
 CMD [ "dumb-init", "npm", "run", "dev" ]
 
 FROM development AS build
-ARG PUBLIC_BACKEND_URL=https://api.localhost
-ENV PUBLIC_BACKEND_URL=$PUBLIC_BACKEND_URL
 RUN npm run build
 RUN npm prune --production
 

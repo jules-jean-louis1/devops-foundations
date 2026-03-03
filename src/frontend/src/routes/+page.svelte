@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { env } from '$env/dynamic/public';
     import ContactForm from "$lib/components/ContactForm.svelte";
+    import { contactService } from "$lib/services/contactService";
+    import { apiService } from "$lib/services/apiService";
 
     interface StatusType {
         database: boolean;
@@ -27,48 +28,44 @@
     async function getDbStatus(): Promise<void> {
         status.database = false;
         try {
-            const res = await fetch(env.PUBLIC_BACKEND_URL + "/db");
-            if (res.ok) {
+            const res = await apiService.getDbStatus();
+            if (res.status === "connected") {
                 status.database = true;
             }
-        } catch (error) {
-            console.error("Database status check failed:", error);
+        } catch (error: any) {
+            console.error("Database status check failed:", error.message);
         }
     }
 
     async function getBackendStatus(): Promise<void> {
         status.backend = false;
         try {
-            const res = await fetch(env.PUBLIC_BACKEND_URL + "/health");
-            if (res.ok) {
-                status.backend = true;
-            }
-        } catch (error) {
-            console.error("Backend status check failed:", error);
+            const res = await apiService.getBackendHealth();
+            status.backend = true;
+        } catch (error: any) {
+            console.error("Backend status check failed:", error.message);
         }
     }
 
     async function getCacheStatus(): Promise<void> {
         status.redis = false;
         try {
-            const res = await fetch(env.PUBLIC_BACKEND_URL + "/cache");
-            if (res.ok) {
+            const res = await apiService.getCacheStatus();
+            if (res.status === "connected") {
                 status.redis = true;
             }
-        } catch (error) {
-            console.error("Cache status check failed:", error);
+        } catch (error: any) {
+            console.error("Cache status check failed:", error.message);
         }
     }
 
     async function getVisitor(): Promise<void> {
         try {
-            const res = await fetch(env.PUBLIC_BACKEND_URL + "/cache/visits");
-            const visits = await res.json();
-            if (res.ok) {
-                visitorCount = visits.visits;
-            }
-        } catch (error) {
-            throw new Error("Cache failed:");
+            const res = await apiService.getVisitorCount();
+            visitorCount = res;
+
+        } catch (error: any) {
+            throw new Error("Visitor count failed: " + error.message);
         }
     }
 </script>

@@ -25,8 +25,6 @@ services:
       context: ../src/backend
       dockerfile: Dockerfile
     depends_on:
-      traefik:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
@@ -45,13 +43,6 @@ services:
     build:
       context: ../src/frontend
       dockerfile: Dockerfile
-    environment:
-      - PUBLIC_BACKEND_URL=https://api.localhost
-    depends_on:
-      traefik:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
     networks:
       - traefik_net
 

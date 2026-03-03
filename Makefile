@@ -16,8 +16,7 @@ trust-certs:
 	@mkcert -install && echo "Autorité locale mkcert installée dans le trust store système/navigateur"
 
 auth_traefik:
-	docker run --rm -it -v "$(CURDIR)/traefik":/data -w /data httpd:alpine htpasswd -B -C 12 -c .htpasswd test1 
-#docker run --rm -it alpine:latest sh -c "apk add --no-cache apache2-utils && htpasswd -nbm test1 password
+	docker run --rm -it -v "$(CURDIR)/traefik":/data -w /data httpd:alpine htpasswd -B -C 12 -c .htpasswd admin password
 
 install: env certs auth_traefik
 	./docker/docker.sh up -d --build
@@ -45,5 +44,3 @@ docker:
 
 %:
 	@:
-
- #TODO: add generate-certs and pass for traefik

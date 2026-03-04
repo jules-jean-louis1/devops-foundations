@@ -1,11 +1,11 @@
 import { json, error } from "@sveltejs/kit";
+import { env } from '$env/dynamic/private';
 import type { RequestHandler } from "@sveltejs/kit";
 
-const BACKEND_URL = process.env.PUBLIC_BACKEND_URL || "http://localhost:3002";
+const BACKEND_URL = "https://api.localhost";
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    // Validation des données
     const body = await request.json();
     const { sender, subject, content } = body;
 
@@ -13,7 +13,6 @@ export const POST: RequestHandler = async ({ request }) => {
       return error(400, "Tous les champs sont requis");
     }
 
-    // Requête vers ton backend
     const response = await fetch(`${BACKEND_URL}/contact`, {
       method: "POST",
       headers: {

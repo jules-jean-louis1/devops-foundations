@@ -1,5 +1,3 @@
-import { PUBLIC_BACKEND_URL } from "$env/static/public";
-
 interface ContactFormData {
   email: string;
   name: string;
@@ -12,9 +10,11 @@ interface ApiResponse<T = unknown> {
   data?: T;
 }
 
+const BACKEND_URL = "https://api.localhost";
+
 export const contactService = {
   async sendMessage(formData: ContactFormData): Promise<ApiResponse> {
-    const response = await fetch(PUBLIC_BACKEND_URL + "/contact", {
+    const response = await fetch(BACKEND_URL + "/contact", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

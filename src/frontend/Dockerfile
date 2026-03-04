@@ -21,23 +21,26 @@ EXPOSE 3001
 CMD [ "dumb-init", "npm", "run", "dev" ]
 
 FROM development AS build
+ARG PUBLIC_BACKEND_URL=https://api.localhost
+ENV PUBLIC_BACKEND_URL=$PUBLIC_BACKEND_URL
 RUN npm run build
 RUN npm prune --production
 
-FROM node:22-bullseye-slim AS production
+FROM node:22-alpine AS production
 LABEL \
     org.opencontainers.image.version="1.0" \
     org.opencontainers.image.ref.name="prod"
 ENV NODE_ENV=production
-RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache dumb-init
 
 WORKDIR /usr/src/app
 USER node
 
-COPY --chown=node:node --from=build /usr/src/app/app/build build/
+COPY --chown=node:node --from=build /usr/src/app/.svelte-kit/output/server ./server
+COPY --chown=node:node --from=build /usr/src/app/.svelte-kit/output/client ./client
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/package.json ./
 
 
 EXPOSE 3001
-CMD ["dumb-init", "node", "dist/main.js"]
+CMD ["dumb-init", "node", "./server/index.js"]

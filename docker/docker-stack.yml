@@ -9,6 +9,13 @@ services:
       mode: global
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -29,6 +36,13 @@ services:
         parallelism: 1
         order: start-first
         delay: 10s
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     networks:
       - backend_net
       - traefik_net
@@ -53,6 +67,8 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - backend_net
 
@@ -63,6 +79,8 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    volumes:
+      - redis-data:/data
     networks:
       - backend_net
 
@@ -97,10 +115,14 @@ services:
     volumes:
       - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
     networks:
       - backend_net
       - traefik_net
-    restart: unless-stopped
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -111,11 +133,15 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
     networks:
       - backend_net
       - traefik_net
     privileged: true
-    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:main
@@ -123,19 +149,24 @@ services:
       - "${GRAFANA_PORT:-3000}:3000"
     volumes:
       - grafana-data:/var/lib/grafana
-    depends_on:
-      prometheus:
-        condition: service_started
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
     networks:
       - traefik_net
-    restart: unless-stopped
 
 networks:
   backend_net:
-    driver: bridge
+    driver: overlay
+    attachable: true
   traefik_net:
-    driver: bridge
+    driver: overlay
+    attachable: true
 
 volumes:
+  postgres-data:
+  redis-data:
   prometheus-data:
   grafana-data:

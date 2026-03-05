@@ -47,3 +47,11 @@ docker: # Exécute une commande Docker Compose personnalisée, par exemple 'make
 
 %:
 	@:
+
+scan-security:
+	@if ! -f ~/.cache/trivy/trivy.db; then \
+		echo "Trivy database not found. Downloading..."; \
+		docker run --rm -v ~/.cache/trivy:/root/.cache/trivy aquasec/trivy --download-db-only; \
+	fi
+	mkdir -p ~/.cache/trivy
+	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v ~/.cache/trivy:/root/.cache/trivy aquasec/trivy image --severity HIGH,CRITICAL --no-progress --exit-code 1 --format table $(shell ./docker/docker.sh images -q)

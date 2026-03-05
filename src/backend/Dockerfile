@@ -20,7 +20,7 @@ LABEL \
 ENV NODE_ENV=development
 USER node
 COPY --chown=node:node package*.json ./
-RUN npm install
+RUN npm ci
 COPY --chown=node:node . .
 EXPOSE 3002
 CMD ["dumb-init", "npm", "run", "dev"]

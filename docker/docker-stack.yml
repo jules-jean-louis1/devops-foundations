@@ -1,0 +1,172 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8082:8082"
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ../traefik/dynamic/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ../traefik/certs:/etc/traefik/certs:ro
+      - ../traefik/.htpasswd:/etc/traefik/htpasswd:ro
+    networks:
+      - traefik_net
+
+  backend:
+    image: backend:latest
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    networks:
+      - backend_net
+      - traefik_net
+
+  frontend:
+    image: frontend:latest
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+    networks:
+      - traefik_net
+
+  postgres:
+    image: postgres:17.2-alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+
+  redis:
+    image: redis:7-alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend_net
+
+  mailhog:
+    image: mailhog/mailhog
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "${PORT_SMTP:-1025}:1025"
+      - "${MAIL_WEB_PORT:-8025}:8025"
+    networks:
+      - backend_net
+
+  adminer:
+    image: adminer:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - backend_net
+      - traefik_net
+
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - backend_net
+      - traefik_net
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - backend_net
+      - traefik_net
+    privileged: true
+
+  grafana:
+    image: grafana/grafana:main
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - traefik_net
+
+networks:
+  backend_net:
+    driver: overlay
+    attachable: true
+  traefik_net:
+    driver: overlay
+    attachable: true
+
+volumes:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:

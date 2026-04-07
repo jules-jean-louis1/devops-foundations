@@ -1,0 +1,129 @@
+tls:
+  certificates:
+    - certFile: /etc/traefik/certs/local.crt
+      keyFile: /etc/traefik/certs/local.key
+
+http:
+  middlewares:
+    security-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+
+    compression:
+      compress: {}
+
+    api-ratelimit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    dashboard-auth:
+      basicAuth:
+        usersFile: /etc/traefik/htpasswd
+
+  routers:
+    traefik:
+      rule: "Host(`traefik.localhost`)"
+      entryPoints:
+        - websecure
+      service: api@internal
+      tls: {}
+      middlewares:
+        - dashboard-auth
+        - security-headers
+
+    backend:
+      rule: "Host(`api.localhost`)"
+      entryPoints:
+        - websecure
+      service: backend
+      tls: {}
+      middlewares:
+        - security-headers
+        - compression
+        - api-ratelimit
+
+    frontend:
+      rule: "Host(`app.localhost`)"
+      entryPoints:
+        - websecure
+      service: frontend
+      tls: {}
+      middlewares:
+        - security-headers
+        - compression
+
+    mailhog:
+      rule: "Host(`mail.localhost`)"
+      entryPoints:
+        - websecure
+      service: mailhog
+      tls: {}
+      middlewares:
+        - security-headers
+        - compression
+
+    adminer:
+      rule: "Host(`db.localhost`)"
+      entryPoints:
+        - websecure
+      service: adminer
+      tls: {}
+      middlewares:
+        - dashboard-auth
+        - security-headers
+    
+    prometheus:
+      rule: "Host(`prometheus.localhost`)"
+      entryPoints:
+        - websecure
+      service: prometheus
+      tls: {}
+      middlewares:
+        - dashboard-auth
+        - security-headers
+
+    grafana:
+      rule: "Host(`monitor.localhost`)"
+      entryPoints:
+        - websecure
+      service: grafana
+      tls: {}
+      middlewares:
+        - dashboard-auth
+        - security-headers
+
+  services:
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://backend:3002"
+
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:3001"
+
+    mailhog:
+      loadBalancer:
+        servers:
+          - url: "http://mailhog:8025"
+
+    adminer:
+      loadBalancer:
+        servers:
+          - url: "http://adminer:8080"
+
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://grafana:3000"
+
+    prometheus:
+      loadBalancer:
+        servers:
+          - url: "http://prometheus:9090"

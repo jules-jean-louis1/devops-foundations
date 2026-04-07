@@ -1,0 +1,74 @@
+services:
+  traefik:
+    command:
+      - "--providers.docker=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  backend:
+    build:
+      target: production
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER_PROD}:${POSTGRES_PASSWORD_PROD}@postgres:5432/${POSTGRES_DB_PROD}
+      - REDIS_URL=${REDIS_URL}
+
+  frontend:
+    build:
+      target: production
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_BACKEND_URL=https://api.localhost
+      - PORT=3001
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    restart: always
+    volumes:
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis_volume:/data
+
+  postgres:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_PROD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PROD:-password}
+      POSTGRES_DB: ${POSTGRES_DB_PROD:-cloudnative}
+    ports:
+      - "${POSTGRES_PORT_PROD:-5433}:5432"
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../database/:/docker-entrypoint-initdb.d/
+
+volumes:
+  postgres_data:
+  redis_volume:

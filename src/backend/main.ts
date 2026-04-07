@@ -3,6 +3,7 @@ import postgres from "@fastify/postgres";
 import redis from "@fastify/redis";
 import nodemailer from "nodemailer";
 import cors from "@fastify/cors";
+import os from "os";
 
 const fastify = Fastify({
   logger: true,
@@ -44,7 +45,11 @@ const transporter = nodemailer.createTransport({
 
 // Declare a route
 fastify.get("/", function (request, reply) {
-  reply.send({ hello: "world" });
+  reply.send({
+    message: "Bienvenue sur l'API DevOps Foundations",
+    version: "1.0.0",
+    hostname: os.hostname(),
+  });
 });
 
 //healthcheck

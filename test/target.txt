@@ -1,0 +1,6 @@
+GET https://app.localhost/
+GET https://app.localhost/api/health
+GET https://app.localhost/api/db
+GET https://app.localhost/api/cache
+GET https://app.localhost/api/cache/visits
+GET https://app.localhost/api/visits

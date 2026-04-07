@@ -14,7 +14,7 @@ LABEL \
 ENV NODE_ENV=development
 USER node
 COPY --chown=node:node package*.json ./
-RUN npm install
+RUN npm ci
 COPY --chown=node:node . .
 RUN npx svelte-kit sync
 EXPOSE 3001
@@ -36,11 +36,9 @@ RUN apk add --no-cache dumb-init
 WORKDIR /usr/src/app
 USER node
 
-COPY --chown=node:node --from=build /usr/src/app/.svelte-kit/output/server ./server
-COPY --chown=node:node --from=build /usr/src/app/.svelte-kit/output/client ./client
+COPY --chown=node:node --from=build /usr/src/app/build ./build
+COPY --chown=node:node --from=build /usr/src/app/package.json ./package.json
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/package.json ./
-
 
 EXPOSE 3001
-CMD ["dumb-init", "node", "./server/index.js"]
+CMD ["dumb-init", "node", "build/index.js"]

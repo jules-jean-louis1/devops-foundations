@@ -22,6 +22,8 @@ api:
   insecure: false
   debug: false
 
+ping: {}
+
 providers:
   docker:
     exposedByDefault: false

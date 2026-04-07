@@ -78,6 +78,7 @@ services:
       - "${MAIL_WEB_PORT:-8025}:8025"
     networks:
       - backend_net
+      - traefik_net
 
   adminer:
     image: adminer:latest
